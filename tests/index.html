@@ -29,6 +29,12 @@
       .codespan-js-comment {
         color: rgb(62, 66, 83);
       }
+      .codespan-js-boolean {
+        color: rgb(241, 151, 163);
+      }
+      .codespan-js-number {
+        color: rgb(232, 136, 99);
+      }
     </style>
 
     <script type="module">
@@ -46,6 +52,9 @@
     <h1>CodeSpan tests</h1>
     <div id="test-container">
       <pre><code data-codespan="js">
+        if (a > b) {}
+        else if (b < c) {}
+const expected_ = `<span class="codespan-js-comment">// this is a comment</span><span class="codespan-js-ws">\n</span>`;
 import stringParse from "../lib/stringParse/src/index.js";
 import {
   keywords,
@@ -56,53 +65,56 @@ import {
 } from "../src/definitions-js.js";
 
 export default function jsAddSpans(text) {
-let options = {};
+  const noop = 1 + 2 / 3 % 4;
+  let options = { typeMap: {}, concat: []};
 
-options.typeMap = {
-  keyword: keywords,
-  declarator: declarators,
-  punctuation: punctuations,
-  quote: quotes,
-  bracket: brackets,
-};
+  options.typeMap = {
+    keyword: keywords,
+    declarator: declarators,
+    punctuation: punctuations,
+    quote: quotes,
+    bracket: brackets,
+  };
 
 
-// here is an line comment
-options.concat = [
-{ type: "comment", start: "//", stop: "\n", includeStartDelimeter: true },
-{
-  type: "comment",
-  start: "/*",
-  stop: "*/",
-  includeStartDelimeter: true,
-  includeStopDelimeter: true,
-},
-];
-/* here is a 
-block comment */
+  // here is an line comment
+  
+  options.concat = [
+    { type: "comment", start: "//", stop: "\n", includeStartDelimeter: true },
+    {
+      type: "comment",
+      start: "/*",
+      stop: "*/",
+      includeStartDelimeter: true,
+      includeStopDelimeter: true,
+    },
+  ];
 
-return stringParse(text, options).reduce((html, { type, value }) => {
-  return (html += `<span class="codespan-js-${type}">${value}</span>`);
-}, "");
+  /* here is a 
+  block comment */
+  return stringParse(text, options).reduce((html, { type, value }) => {
+    return (html += `<span class="codespan-js-${type}">${value}</span>`);
+  }, "");
 }
       </code></pre>
 
       <pre><code data-codespan="js">
 describe(`jsAddSpans(text) transforms comments`, () => {
   test(`single line comments are correct`, () => {
-    const text = `// this is a comment\n`;
-    const expected = `<span class="codespan-js-comment">// this is a comment</span><span class="codespan-js-ws">\n</span>`;
+    const $text = `// this is a comment\n`;
+    const expected_ = `<span class="codespan-js-comment"></span>// this is a comment<span class="codespan-js-ws">\n</span>`;
     
-    expect(jsAddSpans(text)).toBe(expected);
+    expect(jsAddSpans($text)).toBe(expected_);
   });
   
   test(`block comments are correct`, () => {
     const text = `/* this is a comment */`;
     const expected = `<span class="codespan-js-comment">/* this is a comment */</span>`;
     
-    expect(jsAddSpans(text)).toBe(expected);
+    expect(jsAddSpans(text)).toBe(expected); // foo
   });
 });
+/* comment
       </code></pre>
     </div>
   </body>

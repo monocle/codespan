@@ -5,9 +5,17 @@ import {
   punctuations,
   quotes,
   brackets,
+  booleans,
 } from "../src/definitions-js.js";
 
 export function jsAddSpans(text) {
+  const shouldExclude = {
+    word: true,
+    other: true,
+    ws: true,
+    newline: true,
+  };
+
   let options = { concat: [], typeMap: {} };
 
   options.typeMap = {
@@ -16,7 +24,15 @@ export function jsAddSpans(text) {
     punctuation: punctuations,
     quote: quotes,
     bracket: brackets,
+    boolean: booleans,
   };
+
+  options.concat.push({
+    type: "declarator",
+    start: "=>",
+    stop: "",
+    includeStartDelimeter: true,
+  });
 
   quotes.forEach((quoteChar) => {
     options.concat.push({
@@ -42,7 +58,14 @@ export function jsAddSpans(text) {
   });
 
   return stringParse(text, options).reduce((html, { type, value }) => {
-    return (html += `<span class="codespan-js-${type}">${value}</span>`);
+    let value_ = value.replace(/</g, "&lt;");
+    let text = `<span class="codespan-js-${type}">${value_}</span>`;
+
+    if (shouldExclude[type]) {
+      text = value_;
+    }
+
+    return html + text;
   }, "");
 }
 
@@ -50,6 +73,11 @@ export default function addSpans() {
   const codeElems = document.querySelectorAll("[data-codespan='js']");
 
   for (const elem of codeElems) {
-    elem.innerHTML = jsAddSpans(elem.innerText, "js");
+    const innerHTML = elem.innerHTML
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">");
+    const output = jsAddSpans(innerHTML, "js");
+
+    elem.innerHTML = output;
   }
 }

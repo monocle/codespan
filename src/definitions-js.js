@@ -11,7 +11,6 @@ export const keywords = [
   "else",
   "enum",
   "export",
-  "false",
   "finally",
   "for",
   "from",
@@ -34,7 +33,6 @@ export const keywords = [
   "static",
   "this",
   "throw",
-  "true",
   "try",
   "typeof",
   "undefined",
@@ -53,10 +51,13 @@ export const declarators = [
   "function",
   "let",
   "var",
+  "=>",
 ];
 
-export const punctuations = ".;,=!+-*/%".split("");
+export const punctuations = ".:;,=!+-*/%?/\\&|^~#<>".split("");
 
 export const quotes = "'`\"".split("");
 
 export const brackets = "{}[]()".split("");
+
+export const booleans = ["true", "false"];
