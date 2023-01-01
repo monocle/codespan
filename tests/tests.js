@@ -54,10 +54,6 @@ Object.keys(definitions).forEach((typeGroup) => {
 });
 
 describe(`jsAddSpans does not output`, () => {
-  test(`"word" tokens`, () => {
-    expect(jsAddSpans("foo")).toBe("foo");
-  });
-
   test(`"other" tokens`, () => {
     expect(jsAddSpans("✅")).toBe("✅");
   });
@@ -71,14 +67,12 @@ describe(`jsAddSpans does not output`, () => {
   });
 });
 
-describe(`jsAddSpans combines words with:`, () => {
+describe(`jsAddSpans identifies the following chars as words:`, () => {
   ["_", "$"].forEach((char) => {
-    const text = `${char}word${char}`;
+    const text = `<span class="codespan-js-word">${char}</span>`;
 
-    test(`${char} : ${text}`, () => {
-      const html = jsAddSpans(text);
-
-      expect(html).toBe(text);
+    test(char, () => {
+      expect(jsAddSpans(char)).toBe(text);
     });
   });
 });
@@ -118,5 +112,20 @@ describe(`jsAddSpans transforms`, () => {
   test(`">" to "<span class="codespan-js-punctuation">></span>"`, () => {
     const expected = `<span class="codespan-js-punctuation">></span>`;
     expect(jsAddSpans(">")).toBe(expected);
+  });
+});
+
+describe(`jsAddSpans identifies`, () => {
+  test(`function names`, () => {
+    const text = `function foo("function"`;
+    const expected =
+      `<span class="codespan-js-declarator">function</span> ` +
+      `<span class="codespan-js-function-name">foo</span>` +
+      `<span class="codespan-js-bracket">(</span>` +
+      `<span class="codespan-js-quote">"</span>` +
+      `<span class="codespan-js-string">function</span>` +
+      `<span class="codespan-js-quote">"</span>`;
+
+    expect(jsAddSpans(text)).toBe(expected);
   });
 });

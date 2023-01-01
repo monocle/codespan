@@ -8,6 +8,9 @@
     <meta name="color-scheme" content="dark" />
 
     <style>
+      body {
+        background-color: rgb(15, 17, 25);
+      }
       .codespan-js-declarator {
         color: rgb(186, 137, 231);
       }
@@ -17,8 +20,12 @@
       .codespan-js-punctuation {
         color: rgb(142, 210, 251);
       }
+      .codespan-js-quote {
+        color: rgb(156, 219, 251);
+      }
       .codespan-js-keyword {
         color: rgb(156, 219, 251);
+        font-style: italic;
       }
       .codespan-js-string {
         color: rgb(202, 231, 151);
@@ -34,6 +41,9 @@
       }
       .codespan-js-number {
         color: rgb(232, 136, 99);
+      }
+      .codespan-js-function-name {
+        color: rgb(138, 169, 249);
       }
     </style>
 
@@ -54,6 +64,24 @@
       <pre><code data-codespan="js">
         if (a > b) {}
         else if (b < c) {}
+        function foo() { let bar = 1; }
+        foo();
+
+
+        
+function assignFunctionName(token, idx, origTokens) {
+  if (token.value === "(") {
+    for (let i = idx - 1; i >= 0; i--) {
+      if (origTokens[i].type === "ws") continue;
+      if (origTokens[i].type !== "word") break;
+
+      origTokens[i].type = "function-name";
+      break;
+    }
+  }
+  return token;
+}
+
 const expected_ = `<span class="codespan-js-comment">// this is a comment</span><span class="codespan-js-ws">\n</span>`;
 import stringParse from "../lib/stringParse/src/index.js";
 import {

@@ -6,11 +6,24 @@ import {
   quotes,
   brackets,
   booleans,
+  words,
 } from "../src/definitions-js.js";
+
+function assignFunctionName(token, idx, origTokens) {
+  if (token.value === "(") {
+    for (let i = idx - 1; i >= 0; i--) {
+      if (origTokens[i].type === "ws") continue;
+      if (origTokens[i].type !== "word") break;
+
+      origTokens[i].type = "function-name";
+      break;
+    }
+  }
+  return token;
+}
 
 export function jsAddSpans(text) {
   const shouldExclude = {
-    word: true,
     other: true,
     ws: true,
     newline: true,
@@ -25,6 +38,7 @@ export function jsAddSpans(text) {
     quote: quotes,
     bracket: brackets,
     boolean: booleans,
+    word: words,
   };
 
   options.concat.push({
@@ -57,16 +71,18 @@ export function jsAddSpans(text) {
     includeStopDelimeter: true,
   });
 
-  return stringParse(text, options).reduce((html, { type, value }) => {
-    let value_ = value.replace(/</g, "&lt;");
-    let text = `<span class="codespan-js-${type}">${value_}</span>`;
+  return stringParse(text, options)
+    .map(assignFunctionName)
+    .reduce((html, { type, value }) => {
+      let value_ = value.replace(/</g, "&lt;");
+      let text = `<span class="codespan-js-${type}">${value_}</span>`;
 
-    if (shouldExclude[type]) {
-      text = value_;
-    }
+      if (shouldExclude[type]) {
+        text = value_;
+      }
 
-    return html + text;
-  }, "");
+      return html + text;
+    }, "");
 }
 
 export default function addSpans() {

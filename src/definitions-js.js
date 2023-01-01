@@ -61,3 +61,5 @@ export const quotes = "'`\"".split("");
 export const brackets = "{}[]()".split("");
 
 export const booleans = ["true", "false"];
+
+export const words = ["$", "_"];
