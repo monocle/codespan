@@ -7,7 +7,7 @@ import {
   brackets,
   booleans,
 } from "../src/definitions-js.js";
-import { jsAddSpans } from "../src/index.js";
+import jsAddSpans from "../src/javascript.js";
 
 const definitions = {
   keywords,
